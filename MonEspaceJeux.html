@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace de Jeu - Génie Biblique</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS for Styling -->
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f9fc;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+        }
+        #game-rules ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        #game-rules li {
+            background: #f1f1f1;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .list-group-item {
+            background-color: #e9ecef;
+        }
+        .btn-warning, .btn-primary {
+            font-size: 1.2rem;
+        }
+        #questions-section {
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-body {
+            background-color: #f8f9fa;
+        }
+        .form-check-input {
+            margin-right: 10px;
+        }
+        .alert-success {
+            font-size: 1.1rem;
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            display: none;
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="text-center">
+        <h1>Mon Espace de Jeu - Génie Biblique</h1>
+        <p>Répondez aux questions et atteignez le niveau suivant !</p>
+    </header>
+
+    <main class="container my-4">
+        <!-- Règles du Jeu Section -->
+        <section id="game-rules" class="mb-5">
+            <h2 class="text-center mb-3">Règles du Jeu</h2>
+            <ul class="list-group">
+                <li class="list-group-item">Répondez à toutes les questions dans l'ordre du niveau sélectionné.</li>
+                <li class="list-group-item">Chaque question a un temps limité pour y répondre.</li>
+                <li class="list-group-item">Vous devez atteindre un score minimal pour passer au niveau suivant.</li>
+                <li class="list-group-item">Les réponses incorrectes ne comptent pas, mais elles ne pénalisent pas.</li>
+                <li class="list-group-item">Le jeu se termine lorsque vous avez répondu à toutes les questions ou que le temps est écoulé.</li>
+            </ul>
+        </section>
+
+        <!-- Chronomètre Section -->
+        <section id="game-timer" class="text-center mb-4">
+            <h2>Temps Restant</h2>
+            <div id="timer" class="display-4 text-danger">00:00</div>
+            <button id="start-timer" class="btn btn-success mt-3 btn-lg">Démarrer le Chronomètre</button>
+        </section>
+
+        <!-- Sélection du Niveau -->
+        <section id="level-selection" class="mb-4">
+            <h2 class="text-center mb-3">Sélectionnez votre Niveau</h2>
+            <div class="d-flex justify-content-center">
+                <select class="form-select w-50" id="level-select">
+                    <option value="1">Niveau 1</option>
+                    <option value="2">Niveau 2</option>
+                    <option value="3">Niveau 3</option>
+                    <option value="4">Niveau 4</option>
+                    <option value="5">Niveau 5</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Confirmation d'acceptation -->
+        <section id="acceptance" class="mb-4 text-center">
+            <button id="accept-answering" class="btn btn-warning btn-lg">Accepter de répondre aux questions</button>
+            <div id="accept-notification" class="alert alert-info mt-3" style="display: none;">
+                Vous avez accepté de répondre aux questions. Le chronomètre démarre maintenant.
+            </div>
+        </section>
+
+        <!-- Questions Section -->
+        <section id="questions-section" style="display: none;">
+            <h2 class="text-center mb-4">Questions du Niveau <span id="level-title">1</span></h2>
+            <div id="questions-list">
+                <!-- Questions will be dynamically loaded here -->
+            </div>
+            <div class="text-center mt-4">
+                <button id="submit-answers" class="btn btn-primary btn-lg">Répondre</button>
+            </div>
+        </section>
+
+        <!-- Notification Section -->
+        <div id="response-notification" class="alert alert-success mt-4" role="alert" style="display: none;">
+            Merci d'avoir répondu ! Vous recevrez bientôt la proclamation des résultats. Pour être admis au niveau suivant, vous devez atteindre un score minimal.
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2024 Génie Biblique | Tous droits réservés.
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Simulated Data: Questions and Options for each level
+        const questionsData = {
+            1: [
+                {
+                    question: "Quel est le premier livre de la Bible ?",
+                    options: ["Genèse", "Exode", "Lévitiques", "Nombres"],
+                    correctAnswer: "Genèse"
+                },
+                {
+                    question: "Qui a construit l'arche de l'alliance ?",
+                    options: ["David", "Moïse", "Salomon", "Noé"],
+                    correctAnswer: "Moïse"
+                }
+            ],
+            2: [
+                {
+                    question: "Qui est le père de Samuel ?",
+                    options: ["Eli", "Elkanah", "Samuel", "Saul"],
+                    correctAnswer: "Elkanah"
+                },
+                {
+                    question: "Quelle est la première église mentionnée dans la Bible ?",
+                    options: ["L'église de Jérusalem", "L'église d'Antioche", "L'église de Corinthe", "L'église de Rome"],
+                    correctAnswer: "L'église de Jérusalem"
+                }
+            ],
+            // Add data for other levels...
+        };
+
+        // Function to display questions based on selected level
+        function displayQuestions(level) {
+            const questionsContainer = document.getElementById('questions-list');
+            const levelTitle = document.getElementById('level-title');
+            levelTitle.textContent = level; // Update the level title
+
+            // Clear the current questions
+            questionsContainer.innerHTML = '';
+
+            // Loop through the questions of the selected level
+            questionsData[level].forEach((questionData, index) => {
+                const questionHTML = `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Question ${index + 1}: ${questionData.question}</h5>
+                            <ul class="list-group">
+                                ${questionData.options.map(option => `
+                                    <li class="list-group-item">
+                                        <input type="radio" name="question-${index}" value="${option}" class="form-check-input me-2"> 
+                                        ${option}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                questionsContainer.innerHTML += questionHTML;
+            });
+        }
+
+        // Event listener for the level selection dropdown
+        document.getElementById('level-select').addEventListener('change', (event) => {
+            const selectedLevel = event.target.value;
+            displayQuestions(selectedLevel);
+        });
+
+        // Timer functionality
+        let timer;
+        let timeRemaining = 60 * 15; // 15 minutes timer
+
+        // Start the timer when the user accepts
+        document.getElementById('accept-answering').addEventListener('click', () => {
+            const acceptanceSection = document.getElementById('acceptance');
+            const questionsSection = document.getElementById('questions-section');
+            const notification = document.getElementById('accept-notification');
+            
+            // Show the notification
+            notification.style.display = 'block';
+
+            // Hide the acceptance section and show the question section
+            acceptanceSection.style.display = 'none';
+            questionsSection.style.display = 'block';
+
+            // Start the timer
+            timer = setInterval(function () {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById('timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                if (timeRemaining <= 0) {
+                    clearInterval(timer);
+                    // Code to submit answers
+                }
+                timeRemaining--;
+            }, 1000);
+        });
+
+        // Submit answers
+        document.getElementById('submit-answers').addEventListener('click', () => {
+            // Process answers (just display thank you for now)
+            const responseNotification = document.getElementById('response-notification');
+            responseNotification.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
